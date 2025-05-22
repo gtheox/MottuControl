@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DetalhesCliente({ route, navigation }) {
   const cliente = route.params?.cliente;
+  const [motosAlugadas, setMotosAlugadas] = useState([]);
+
+  useEffect(() => {
+    if (cliente) {
+      carregarMotosAlugadas(cliente.id);
+    }
+  }, [cliente]);
+
+  const carregarMotosAlugadas = async (clienteId) => {
+    try {
+      const jsonMotos = await AsyncStorage.getItem('@motos_list');
+      const motos = jsonMotos ? JSON.parse(jsonMotos) : [];
+      const alugadas = motos.filter(
+        moto => moto.clienteId === clienteId && moto.status === 'Alugada'
+      );
+      setMotosAlugadas(alugadas);
+    } catch (error) {
+      console.log('Erro ao carregar motos:', error);
+    }
+  };
 
   if (!cliente) {
     return (
@@ -51,6 +72,20 @@ export default function DetalhesCliente({ route, navigation }) {
 
         <Text style={styles.label}>Data de Nascimento:</Text>
         <Text style={styles.value}>{cliente.dataNascimento || '-'}</Text>
+
+        <View style={styles.divider} />
+
+        <Text style={styles.subTitle}>Motos Alugadas</Text>
+        {motosAlugadas.length > 0 ? (
+          motosAlugadas.map((moto) => (
+            <View key={moto.id} style={styles.motoItem}>
+              <Text style={styles.motoText}>Modelo: {moto.modelo}</Text>
+              <Text style={styles.motoText}>Placa: {moto.placa}</Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.noMotosText}>Este cliente não possui motos alugadas.</Text>
+        )}
       </ScrollView>
     </LinearGradient>
   );
@@ -92,5 +127,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 40,
     fontSize: 18,
+  },
+  divider: {
+    borderBottomColor: '#00af34',
+    borderBottomWidth: 1,
+    marginVertical: 20,
+  },
+  subTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00af34',
+    marginBottom: 15,
+  },
+  motoItem: {
+    backgroundColor: '#006622',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  motoText: {
+    color: '#cce5cc',
+    fontSize: 16,
+  },
+  noMotosText: {
+    color: '#ccc',
+    fontStyle: 'italic',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

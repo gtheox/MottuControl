@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const STORAGE_KEY = '@clientes_list';
 
-export default function FormularioClientes({ navigation }) {
+export default function FormularioClientes({ navigation, route }) {
+  const clienteParaEditar = route.params?.clienteParaEditar;
+
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
@@ -31,6 +33,20 @@ export default function FormularioClientes({ navigation }) {
   const [dataNascimento, setDataNascimento] = useState('');
   const [email, setEmail] = useState('');
   const [loadingCep, setLoadingCep] = useState(false);
+
+  useEffect(() => {
+    if (clienteParaEditar) {
+      setNome(clienteParaEditar.nome || '');
+      setCpf(clienteParaEditar.cpf || '');
+      setTelefone(clienteParaEditar.telefone || '');
+      setCep(clienteParaEditar.cep || '');
+      setEndereco(clienteParaEditar.endereco || '');
+      setNumero(clienteParaEditar.numero || '');
+      setComplemento(clienteParaEditar.complemento || '');
+      setDataNascimento(clienteParaEditar.dataNascimento || '');
+      setEmail(clienteParaEditar.email || '');
+    }
+  }, [clienteParaEditar]);
 
   function validarCPF(strCPF) {
     let cpfLimpo = strCPF.replace(/[^\d]+/g, '');
@@ -103,33 +119,45 @@ export default function FormularioClientes({ navigation }) {
       const jsonClientes = await AsyncStorage.getItem(STORAGE_KEY);
       let clientes = jsonClientes ? JSON.parse(jsonClientes) : [];
 
-      const novoCliente = {
-        id: Date.now().toString(),
-        nome,
-        cpf,
-        telefone,
-        cep,
-        endereco,
-        numero,
-        complemento,
-        dataNascimento,
-        email,
-      };
+      if (clienteParaEditar) {
+        // Atualizar cliente existente
+        clientes = clientes.map(c => {
+          if (c.id === clienteParaEditar.id) {
+            return {
+              ...c,
+              nome,
+              cpf,
+              telefone,
+              cep,
+              endereco,
+              numero,
+              complemento,
+              dataNascimento,
+              email,
+            };
+          }
+          return c;
+        });
+      } else {
+        // Criar novo cliente
+        const novoCliente = {
+          id: Date.now().toString(),
+          nome,
+          cpf,
+          telefone,
+          cep,
+          endereco,
+          numero,
+          complemento,
+          dataNascimento,
+          email,
+        };
+        clientes.push(novoCliente);
+      }
 
-      clientes.push(novoCliente);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
 
-      Alert.alert('Sucesso', 'Cliente salvo com sucesso!');
-
-      setNome('');
-      setCpf('');
-      setTelefone('');
-      setCep('');
-      setEndereco('');
-      setNumero('');
-      setComplemento('');
-      setDataNascimento('');
-      setEmail('');
+      Alert.alert('Sucesso', clienteParaEditar ? 'Cliente atualizado!' : 'Cliente cadastrado!');
 
       navigation.goBack();
     } catch (error) {
@@ -158,7 +186,7 @@ export default function FormularioClientes({ navigation }) {
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
 
-          <Text style={styles.title}>Cadastro de Cliente</Text>
+          <Text style={styles.title}>{clienteParaEditar ? 'Editar Cliente' : 'Cadastro de Cliente'}</Text>
 
           <Text style={styles.label}>Nome *</Text>
           <TextInput
@@ -256,7 +284,11 @@ export default function FormularioClientes({ navigation }) {
             autoCapitalize="none"
           />
 
-          <Button title="Salvar Cliente" onPress={salvarCliente} color="#00af34" />
+          <Button
+            title={clienteParaEditar ? 'Salvar Alterações' : 'Cadastrar Cliente'}
+            onPress={salvarCliente}
+            color="#00af34"
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>

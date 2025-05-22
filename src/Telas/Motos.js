@@ -11,19 +11,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
-const motosCatalogo = [
-  {
-    modelo: 'Mottu Pop',
-    imagem: require('../../assets/pop.png'),
-  },
-  {
-    modelo: 'Mottu Sport',
-    imagem: require('../../assets/sport.png'),
-  },
-  {
-    modelo: 'Mottu-E',
-    imagem: require('../../assets/mottu-e.png'),
-  },
+const modelos = [
+  { modelo: 'Mottu Pop', imagem: require('../../assets/pop.png') },
+  { modelo: 'Mottu Sport', imagem: require('../../assets/sport.png') },
+  { modelo: 'Mottu-E', imagem: require('../../assets/mottu-e.png') },
 ];
 
 const { width, height } = Dimensions.get('window');
@@ -35,13 +26,13 @@ export default function Motos({ navigation }) {
   const flatListRef = useRef(null);
 
   const goPrev = () => {
-    const prevIndex = currentIndex === 0 ? motosCatalogo.length - 1 : currentIndex - 1;
+    const prevIndex = currentIndex === 0 ? modelos.length - 1 : currentIndex - 1;
     flatListRef.current.scrollToIndex({ index: prevIndex, animated: true });
     setCurrentIndex(prevIndex);
   };
 
   const goNext = () => {
-    const nextIndex = currentIndex === motosCatalogo.length - 1 ? 0 : currentIndex + 1;
+    const nextIndex = currentIndex === modelos.length - 1 ? 0 : currentIndex + 1;
     flatListRef.current.scrollToIndex({ index: nextIndex, animated: true });
     setCurrentIndex(nextIndex);
   };
@@ -57,8 +48,8 @@ export default function Motos({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={() => navigation.navigate('DetalhesMotos', { modelo: item.modelo })}
       style={styles.card}
+      onPress={() => navigation.navigate('DetalhesMotos', { modelo: item.modelo })}
     >
       <Image source={item.imagem} style={styles.image} resizeMode="contain" />
       <Text style={styles.modelo}>{item.modelo}</Text>
@@ -76,7 +67,7 @@ export default function Motos({ navigation }) {
 
         <FlatList
           ref={flatListRef}
-          data={motosCatalogo}
+          data={modelos}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
@@ -100,7 +91,7 @@ export default function Motos({ navigation }) {
       </View>
 
       <View style={styles.indicators}>
-        {motosCatalogo.map((_, index) => (
+        {modelos.map((_, index) => (
           <TouchableOpacity
             key={index.toString()}
             style={[
@@ -119,9 +110,7 @@ export default function Motos({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   title: {
     fontSize: 28,
     fontWeight: 'bold',

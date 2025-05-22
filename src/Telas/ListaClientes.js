@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
   Keyboard,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,6 +38,7 @@ export default function ListaClientes({ navigation }) {
       clientesSalvos.sort((a, b) => a.nome.localeCompare(b.nome));
 
       setClientes(clientesSalvos);
+      setClientesFiltrados(clientesSalvos);
     } catch (error) {
       console.log('Erro ao carregar clientes:', error);
     }
@@ -55,16 +57,62 @@ export default function ListaClientes({ navigation }) {
     Keyboard.dismiss();
   };
 
+  const confirmarExcluir = (id) => {
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir este cliente?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Excluir', style: 'destructive', onPress: () => excluirCliente(id) },
+      ]
+    );
+  };
+
+  const excluirCliente = async (id) => {
+    try {
+      const novosClientes = clientes.filter(c => c.id !== id);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(novosClientes));
+      setClientes(novosClientes);
+      setClientesFiltrados(novosClientes);
+      Alert.alert('Sucesso', 'Cliente excluído com sucesso!');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível excluir o cliente.');
+      console.log(error);
+    }
+  };
+
+  const navegarEditar = (cliente) => {
+    navigation.navigate('FormularioClientes', { clienteParaEditar: cliente });
+  };
+
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => navigation.navigate('DetalhesCliente', { cliente: item })}
-    >
-      <Text style={styles.nome}>{item.nome}</Text>
-      {item.telefone ? <Text style={styles.info}>Telefone: {item.telefone}</Text> : null}
-      {item.email ? <Text style={styles.info}>Email: {item.email}</Text> : null}
-      {item.cpf ? <Text style={styles.info}>CPF: {item.cpf}</Text> : null}
-    </TouchableOpacity>
+    <View style={styles.item}>
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => navigation.navigate('DetalhesCliente', { cliente: item })}
+      >
+        <Text style={styles.nome}>{item.nome}</Text>
+        {item.telefone ? <Text style={styles.info}>Telefone: {item.telefone}</Text> : null}
+        {item.email ? <Text style={styles.info}>Email: {item.email}</Text> : null}
+        {item.cpf ? <Text style={styles.info}>CPF: {item.cpf}</Text> : null}
+      </TouchableOpacity>
+
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
+          onPress={() => navegarEditar(item)}
+        >
+          <Ionicons name="pencil" size={20} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.deleteButton]}
+          onPress={() => confirmarExcluir(item.id)}
+        >
+          <Ionicons name="trash" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   return (
@@ -132,10 +180,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   item: {
+    flexDirection: 'row',
     backgroundColor: '#00af34',
     padding: 15,
     borderRadius: 15,
     marginBottom: 12,
+    alignItems: 'center',
   },
   nome: {
     fontSize: 20,
@@ -151,5 +201,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#777',
     fontSize: 18,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  button: {
+    padding: 8,
+    borderRadius: 8,
+    marginLeft: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButton: {
+    backgroundColor: '#000',
+  },
+  deleteButton: {
+    backgroundColor: '#b22222',
   },
 });
