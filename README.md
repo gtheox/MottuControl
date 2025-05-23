@@ -12,7 +12,7 @@
 
 O **Mottu Control** é uma solução tecnológica desenvolvida para o mapeamento inteligente e gestão de motos em pátios de filiais da empresa Mottu. O sistema utiliza tecnologias modernas para monitorar a localização e o status das motos, facilitando o controle de disponibilidade, aluguel, manutenção e cadastro de clientes associados.
 
-### Funcionalidades principais
+## Funcionalidades principais
 
 - Visualização e filtragem de motos por modelo, placa e status.
 - Cadastro e edição de motos e clientes.
@@ -34,7 +34,7 @@ O **Mottu Control** é uma solução tecnológica desenvolvida para o mapeamento
 
 ## Passos
 
-\***\*Clone o repositório:**
+**Clone o repositório:**
 
 - git clone https://github.com/gtheox/MottuControl
 - cd MottuControl
@@ -49,19 +49,6 @@ O **Mottu Control** é uma solução tecnológica desenvolvida para o mapeamento
 - Abra o app no dispositivo ou emulador:
 - No dispositivo: escaneie o QR code com Expo Go (Android/iOS)
 - No emulador: escolha rodar no Android Studio
-
-## Estrutura do Projeto
-
-MottuControl/
-│
-├── src/
-│ ├── Telas/ # Telas do app (Home, Motos, Clientes, Formulários)
-│ ├── assets/ # Imagens e recursos estáticos
-│ └── App.js # Configuração de navegação e entrada principal
-│
-├── package.json # Dependências e scripts
-├── README.md # Documentação do projeto
-└── ...
 
 ## Uso do Aplicativo
 
@@ -78,5 +65,5 @@ Gabriel Teodoro [gtheox](https://github.com/gtheox) [perfil](https://www.linkedi
 Luka Shibuya [lukashibuya](https://github.com/lukashibuya) [perfil](https://www.linkedin.com/in/luka-shibuya-b62a322b3/)
 Eduardo Giovannini [DuGiovannini](https://github.com/DuGiovannini) [perfil](https://www.linkedin.com/in/eduardo-giovannini-157216262/)
 
-**\*\***Licença\*\*
+**Licença**
 Este projeto é destinado ao uso acadêmico e pessoal, sem fins comerciais.
