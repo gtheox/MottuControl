@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   Keyboard,
   Modal,
   Alert,
-  ScrollView,
+  RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,30 +26,18 @@ export default function DetalhesMotos({ route, navigation }) {
   const [statusFiltro, setStatusFiltro] = useState('Todos');
   const [modalFiltroVisible, setModalFiltroVisible] = useState(false);
 
-  // Modal alterar status
   const [modalStatusVisible, setModalStatusVisible] = useState(false);
   const [motoSelecionada, setMotoSelecionada] = useState(null);
   const [novoStatus, setNovoStatus] = useState('');
 
-  // Modal editar cliente
   const [modalClienteVisible, setModalClienteVisible] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
   const [buscaCliente, setBuscaCliente] = useState('');
 
-  useEffect(() => {
-    carregarMotos();
-    carregarClientes();
-  }, []);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    aplicarFiltros();
-  }, [filtroPlaca, statusFiltro, motos]);
-
-  useEffect(() => {
-    filtrarClientes(buscaCliente);
-  }, [buscaCliente, clientes]);
-
+  // Carregar motos do AsyncStorage
   const carregarMotos = async () => {
     try {
       const jsonMotos = await AsyncStorage.getItem('@motos_list');
@@ -61,6 +49,7 @@ export default function DetalhesMotos({ route, navigation }) {
     }
   };
 
+  // Carregar clientes do AsyncStorage
   const carregarClientes = async () => {
     try {
       const jsonClientes = await AsyncStorage.getItem('@clientes_list');
@@ -72,6 +61,28 @@ export default function DetalhesMotos({ route, navigation }) {
     }
   };
 
+  // Função pull-to-refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Promise.all([carregarMotos(), carregarClientes()]).then(() => {
+      setRefreshing(false);
+    });
+  }, [modelo]);
+
+  useEffect(() => {
+    carregarMotos();
+    carregarClientes();
+  }, [modelo]);
+
+  useEffect(() => {
+    aplicarFiltros();
+  }, [filtroPlaca, statusFiltro, motos]);
+
+  useEffect(() => {
+    filtrarClientes(buscaCliente);
+  }, [buscaCliente, clientes]);
+
+  // Filtrar clientes pela busca
   const filtrarClientes = (texto) => {
     const textoMinusculo = texto.toLowerCase();
     const filtrados = clientes.filter(cliente =>
@@ -80,6 +91,7 @@ export default function DetalhesMotos({ route, navigation }) {
     setClientesFiltrados(filtrados);
   };
 
+  // Aplicar filtros nas motos
   const aplicarFiltros = () => {
     let filtradas = motos;
 
@@ -102,21 +114,21 @@ export default function DetalhesMotos({ route, navigation }) {
     Keyboard.dismiss();
   };
 
-  // Abrir modal status
+  // Função para abrir modal de alteração de status
   const abrirModalStatus = (moto) => {
     setMotoSelecionada(moto);
     setNovoStatus(moto.status);
     setModalStatusVisible(true);
   };
 
-  // Salvar novo status
+  // Salvar novo status da moto
   const salvarNovoStatus = async () => {
     if (!novoStatus) return;
 
     try {
       const motosAtualizadas = motos.map(moto => {
         if (moto.id === motoSelecionada.id) {
-          // Se status mudou de "Alugada" para outro, remove cliente vinculado
+          // Se status mudou de "Alugada" para outro, desvincula cliente
           if (moto.status === 'Alugada' && novoStatus !== 'Alugada') {
             return { ...moto, status: novoStatus, clienteId: null, clienteNome: null, clienteCPF: null };
           }
@@ -133,9 +145,9 @@ export default function DetalhesMotos({ route, navigation }) {
     }
   };
 
-  // Abrir modal cliente para editar
+  // Abrir modal para alterar cliente da moto
   const abrirModalCliente = (moto) => {
-    if(moto.status !== 'Alugada'){
+    if (moto.status !== 'Alugada') {
       Alert.alert('Aviso', 'Só é possível alterar o cliente se o status for "Alugada".');
       return;
     }
@@ -145,7 +157,7 @@ export default function DetalhesMotos({ route, navigation }) {
     setModalClienteVisible(true);
   };
 
-  // Atualizar cliente da moto
+  // Atualizar cliente vinculado à moto
   const atualizarClienteMoto = async (cliente) => {
     try {
       const motosAtualizadas = motos.map(moto => {
@@ -168,7 +180,7 @@ export default function DetalhesMotos({ route, navigation }) {
     }
   };
 
-  // Atualiza o AsyncStorage e o estado local
+  // Atualiza AsyncStorage e estados locais
   const atualizarMotosStorage = async (listaAtualizada) => {
     setMotos(listaAtualizada);
     setMotosFiltradas(listaAtualizada);
@@ -211,7 +223,6 @@ export default function DetalhesMotos({ route, navigation }) {
 
   return (
     <LinearGradient colors={['#000000', '#004d00']} style={styles.container}>
-      {/* Botão Voltar */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={28} color="#00af34" />
         <Text style={styles.backText}>Voltar</Text>
@@ -247,9 +258,7 @@ export default function DetalhesMotos({ route, navigation }) {
       <FlatList
         data={motosFiltradas}
         keyExtractor={item => item.id}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>Nenhuma moto encontrada.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma moto encontrada.</Text>}
         renderItem={({ item }) => (
           <View style={styles.motoItem}>
             <Text style={styles.motoModelo}>Modelo: {item.modelo}</Text>
@@ -287,6 +296,13 @@ export default function DetalhesMotos({ route, navigation }) {
             </View>
           </View>
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#00af34']}
+          />
+        }
       />
 
       {/* Modal filtro */}

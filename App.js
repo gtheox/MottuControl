@@ -2,14 +2,13 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 import Home from './src/Telas/Home';
 import Motos from './src/Telas/Motos';
 import DetalhesMotos from './src/Telas/DetalhesMotos';
 import FormularioMotos from './src/Telas/FormularioMotos';
-import Configuracoes from './src/Telas/Configuracoes';
-
+import Sobre from './src/Telas/Sobre';  // Tela "Sobre"
 import ListaClientes from './src/Telas/ListaClientes';
 import FormularioClientes from './src/Telas/FormularioClientes';
 import DetalhesCliente from './src/Telas/DetalhesCliente';
@@ -54,8 +53,8 @@ export default function App() {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'FormularioTab') {
               iconName = focused ? 'create' : 'create-outline';
-            } else if (route.name === 'ConfiguracoesTab') {
-              iconName = focused ? 'settings' : 'settings-outline';
+            } else if (route.name === 'SobreTab') {
+              iconName = focused ? 'information-circle' : 'information-circle-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -85,9 +84,9 @@ export default function App() {
           options={{ tabBarLabel: 'Cadastrar' }}
         />
         <Tab.Screen
-          name="ConfiguracoesTab"
-          component={Configuracoes}
-          options={{ tabBarLabel: 'Configurações' }}
+          name="SobreTab"
+          component={Sobre}
+          options={{ tabBarLabel: 'Sobre' }}
         />
       </Tab.Navigator>
     </NavigationContainer>

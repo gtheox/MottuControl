@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Button,
   Keyboard,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,21 +21,13 @@ export default function ListaClientes({ navigation }) {
   const [clientes, setClientes] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
-
-  useEffect(() => {
-    carregarClientes();
-  }, []);
-
-  useEffect(() => {
-    filtrarClientes(filtro);
-  }, [filtro, clientes]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const carregarClientes = async () => {
     try {
       const jsonClientes = await AsyncStorage.getItem(STORAGE_KEY);
       let clientesSalvos = jsonClientes ? JSON.parse(jsonClientes) : [];
 
-      // Ordena alfabeticamente pelo nome
       clientesSalvos.sort((a, b) => a.nome.localeCompare(b.nome));
 
       setClientes(clientesSalvos);
@@ -43,6 +36,14 @@ export default function ListaClientes({ navigation }) {
       console.log('Erro ao carregar clientes:', error);
     }
   };
+
+  useEffect(() => {
+    carregarClientes();
+  }, []);
+
+  useEffect(() => {
+    filtrarClientes(filtro);
+  }, [filtro, clientes]);
 
   const filtrarClientes = (texto) => {
     const textoMinusculo = texto.toLowerCase();
@@ -84,6 +85,12 @@ export default function ListaClientes({ navigation }) {
   const navegarEditar = (cliente) => {
     navigation.navigate('FormularioClientes', { clienteParaEditar: cliente });
   };
+
+  // Função de refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    carregarClientes().then(() => setRefreshing(false));
+  }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
@@ -149,6 +156,9 @@ export default function ListaClientes({ navigation }) {
           <Text style={styles.emptyText}>Nenhum cliente encontrado.</Text>
         }
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#00af34']} />
+        }
       />
     </LinearGradient>
   );

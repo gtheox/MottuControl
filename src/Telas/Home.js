@@ -11,6 +11,7 @@ export default function Home({ navigation }) {
       </View>
 
       <View style={styles.buttonsContainer}>
+        {/* Botão para Motos */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('MotosTab')}
@@ -18,6 +19,7 @@ export default function Home({ navigation }) {
           <Text style={styles.buttonText}>Ver Motos</Text>
         </TouchableOpacity>
 
+        {/* Botão para Cadastrar Moto */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('FormularioTab')}
@@ -25,11 +27,30 @@ export default function Home({ navigation }) {
           <Text style={styles.buttonText}>Cadastrar Moto</Text>
         </TouchableOpacity>
 
+        {/* Botão para Clientes */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('ConfiguracoesTab')}
+          onPress={() => navigation.navigate('ClientesTab')}
         >
-          <Text style={styles.buttonText}>Configurações</Text>
+          <Text style={styles.buttonText}>Clientes</Text>
+        </TouchableOpacity>
+
+        {/* Botão para Cadastrar Cliente corrigido */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate('ClientesTab', { screen: 'FormularioClientes' })
+          }
+        >
+          <Text style={styles.buttonText}>Cadastrar Cliente</Text>
+        </TouchableOpacity>
+
+        {/* Botão para Sobre */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('SobreTab')}
+        >
+          <Text style={styles.buttonText}>Sobre</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -38,7 +59,7 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
   },
   header: {
     alignItems: 'center',
@@ -56,7 +77,7 @@ const styles = StyleSheet.create({
     color: '#00af34',
   },
   buttonsContainer: {
-    flex:1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
