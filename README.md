@@ -61,9 +61,9 @@ O **Mottu Control** é uma solução tecnológica desenvolvida para o mapeamento
 ## **Contato dos Desenvolvedores**
 
 Nome GitHub LinkedIn
-Gabriel Teodoro [gtheox](https://github.com/gtheox) [perfil](https://www.linkedin.com/in/gabriel-teodoro-gon%C3%A7alves-rosa-a26970236/)
-Luka Shibuya [lukashibuya](https://github.com/lukashibuya) [perfil](https://www.linkedin.com/in/luka-shibuya-b62a322b3/)
-Eduardo Giovannini [DuGiovannini](https://github.com/DuGiovannini) [perfil](https://www.linkedin.com/in/eduardo-giovannini-157216262/)
+- Gabriel Teodoro [gtheox](https://github.com/gtheox) [perfil](https://www.linkedin.com/in/gabriel-teodoro-gon%C3%A7alves-rosa-a26970236/)
+- Luka Shibuya [lukashibuya](https://github.com/lukashibuya) [perfil](https://www.linkedin.com/in/luka-shibuya-b62a322b3/)
+- Eduardo Giovannini [DuGiovannini](https://github.com/DuGiovannini) [perfil](https://www.linkedin.com/in/eduardo-giovannini-157216262/)
 
 **Licença**
 Este projeto é destinado ao uso acadêmico e pessoal, sem fins comerciais.
